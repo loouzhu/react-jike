@@ -1,13 +1,22 @@
 import React from 'react'
-import { Card, Form, Input, Button, Space } from 'antd'
+import { Card, Form, Input, Button, Space, message } from 'antd'
+import { fetchLogin } from '@/features/jikeSlice';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import './login.scss'
 
 export default function Login() {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const onFinish = values => {
     console.log('Success:', values);
+    dispatch(fetchLogin(values))
+    navigate('/')
+    message.success('登录成功')
   };
   const onFinishFailed = errorInfo => {
     console.log('Failed:', errorInfo);
+    message.error('输入格式不正确')
   };
   const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
@@ -40,22 +49,25 @@ export default function Login() {
         >
           <Form.Item
             label="手机号"
-            name="tel"
+            name="mobile"
             labelCol={telPasswordLabel}
             rules={[
               // 如果写了多条，就会按照顺序依次校验
               { required: true, message: '请输入手机号!' },
-              { pattern: /^1[3-9]\d{9}$/, message: '请输入13位手机号！' }
+              { pattern: /^1[3-9]\d{9}$/, message: '请输入11位手机号！' }
             ]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
-            label="密码"
-            name="password"
+            label="验证码"
+            name="code"
             labelCol={telPasswordLabel}
-            rules={[{ required: true, message: '请输入密码!' }]}
+            rules={[
+              { required: true, message: '请输入验证码!' },
+              { pattern: /^246810$/, message: '验证码是246810' }
+            ]}
           >
             <Input.Password />
           </Form.Item>

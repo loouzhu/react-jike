@@ -5,20 +5,20 @@ import axios from "axios";
 // 发起请求 → 请求拦截器 → 发送请求 → 接收响应 → 响应拦截器 → 业务代码
 
 // 1.根域名配置
-const http = axios.create({
+const request = axios.create({
   baseURL: 'http://geek.itheima.net/v1_0',
   // 2.超时时间
   timeout: 5000
 })
 
 // 3.请求拦截器/响应拦截器
-http.interceptors.request.use((config) => {
+request.interceptors.request.use((config) => {
   return config
 }, (error) => {
   return Promise.reject(error)
 })
 
-http.interceptors.response.use((response) => {
+request.interceptors.response.use((response) => {
   // 2xx 范围内的状态码触发
   // 对响应数据的操作
   return response.data
@@ -28,4 +28,4 @@ http.interceptors.response.use((response) => {
   return Promise.reject(error)
 })
 
-export default { http }
+export { request }
