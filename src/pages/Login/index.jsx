@@ -8,11 +8,11 @@ import './login.scss'
 export default function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const onFinish = values => {
+  const onFinish = async values => {
     console.log('Success:', values);
-    dispatch(fetchLogin(values))
-    navigate('/')
+    await dispatch(fetchLogin(values))
     message.success('登录成功')
+    navigate('/')
   };
   const onFinishFailed = errorInfo => {
     console.log('Failed:', errorInfo);

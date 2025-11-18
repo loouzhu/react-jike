@@ -1,18 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { request } from '@/utils/request'
+import { request, getToken, setToken as _setToken } from '@/utils'
+
 export const jikeSlice = createSlice({
   name: 'jike',
   initialState: {
-    token: localStorage.getItem('token') || ''
+    token: getToken() || '',
+    userInfo: {}
   },
   reducers: {
     // 修改token
     setToken(state, action) {
       state.token = action.payload
-      localStorage.setItem('token', action.payload)
+      _setToken(action.payload)
+    },
+    // 提交用户信息
+    setUserInfo(state, action) {
+      state.userInfo = action.payload
     }
   },
 });
+
+export const { setToken, setUserInfo } = jikeSlice.actions
 
 // 异步方法，用于在完成登录之后获取token
 export const fetchLogin = (loginForm) => {
@@ -29,6 +37,17 @@ export const fetchLogin = (loginForm) => {
   }
 }
 
-export default jikeSlice.reducer;
+// 获取用户信息的异步方法
+export const fetchUserInfo = () => {
+  return async (dispatch) => {
+    try {
+      const res = await request.get('/user/profile')
+      dispatch(setUserInfo(res.data))
+      return Promise.resolve(res)
+    } catch (err) {
+      return Promise.reject(err)
+    }
+  }
+}
 
-export const { setToken } = jikeSlice.actions
+export default jikeSlice.reducer;
