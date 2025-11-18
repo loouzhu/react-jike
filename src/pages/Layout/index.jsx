@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import './index.scss'
-import { fetchUserInfo } from '@/features/jikeSlice'
+import { fetchUserInfo, setUserInfo, setToken } from '@/features/jikeSlice'
 
 const { Header, Sider } = Layout
 
@@ -50,8 +50,18 @@ const GeekLayout = () => {
             {useSelector(state => state.jike.userInfo.name)}
           </span>
           <span className="user-logout">
-            <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消">
-              <LogoutOutlined /> 退出
+            <Popconfirm
+              title="是否确认退出？"
+              okText="退出"
+              cancelText="取消"
+              onConfirm={() => {
+                dispatch(setToken(''))
+                dispatch(setUserInfo({}))
+                navigate('/login')
+              }}
+            >
+              <LogoutOutlined />
+              退出
             </Popconfirm>
           </span>
         </div>
