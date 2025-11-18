@@ -1,6 +1,6 @@
 // axios的封装处理
 import axios from "axios";
-import { getToken } from '@/utils'
+import { getToken, removeToken } from '@/utils'
 
 // 流程：
 // 发起请求 → 请求拦截器 → 发送请求 → 接收响应 → 响应拦截器 → 业务代码
@@ -32,6 +32,11 @@ request.interceptors.response.use((response) => {
 }, (error) => {
   // 超出2xx范围的状态码都会触发该函数
   // 对错误响应的操作
+  console.dir(error)
+  if (error.response.status === 401) {
+    removeToken()
+    window.location.href = '/login'
+  }
   return Promise.reject(error)
 })
 

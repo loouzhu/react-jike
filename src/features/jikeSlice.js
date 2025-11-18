@@ -20,7 +20,7 @@ export const jikeSlice = createSlice({
   },
 });
 
-export const { setToken, setUserInfo } = jikeSlice.actions
+export const { setToken, setUserInfo, removeToken } = jikeSlice.actions
 
 // 异步方法，用于在完成登录之后获取token
 export const fetchLogin = (loginForm) => {

@@ -53,8 +53,8 @@ export default function Login() {
             labelCol={telPasswordLabel}
             rules={[
               // 如果写了多条，就会按照顺序依次校验
-              { required: true, message: '请输入手机号!' },
-              { pattern: /^1[3-9]\d{9}$/, message: '请输入11位手机号！' }
+              { required: true, message: '请输入手机号' },
+              { pattern: /^13888888888$/, message: '输入13888888888' }
             ]}
           >
             <Input />
