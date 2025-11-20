@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { request, getToken, setToken as _setToken } from '@/utils'
+import { loginAPI, getUserInfoAPI } from '../apis/user';
+import { getToken, setToken as _setToken } from '@/utils'
 
 export const jikeSlice = createSlice({
   name: 'jike',
@@ -27,7 +28,7 @@ export const fetchLogin = (loginForm) => {
   return async (dispatch) => {
     try {
       // 发送异步请求
-      const res = await request.post('/authorizations', loginForm)
+      const res = await loginAPI(loginForm)
       // 提交同步方法，token存入
       dispatch(setToken(res.data.token))
       return Promise.resolve(res)
@@ -41,7 +42,7 @@ export const fetchLogin = (loginForm) => {
 export const fetchUserInfo = () => {
   return async (dispatch) => {
     try {
-      const res = await request.get('/user/profile')
+      const res = await getUserInfoAPI()
       dispatch(setUserInfo(res.data))
       return Promise.resolve(res)
     } catch (err) {
