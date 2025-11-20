@@ -22,6 +22,7 @@ const { Option } = Select
 
 const Publish = () => {
   const [form] = Form.useForm()
+
   // 获取频道列表
   const [channelList, setChannelList] = useState([])
   useEffect(() => {
@@ -31,6 +32,7 @@ const Publish = () => {
     }
     getChannelList()
   }, [])
+
   // 提交表单
   const onFinish = (formValue) => {
     const { title, channel_id, content } = formValue
@@ -39,8 +41,8 @@ const Publish = () => {
       title,
       content,
       cover: {
-        type: 0,
-        images: []
+        type: imageType,
+        images: imageList.map((item) => item.response.data.url)
       },
       channel_id
     }
@@ -51,10 +53,20 @@ const Publish = () => {
       form.resetFields()
     })
   }
+
   // 上传图片的状态改变时的回调
+  const [imageList, setImageList] = useState([])
   const onChange = (value) => {
-    console.log(value)
+    console.log(value.fileList)
+    setImageList(value.fileList)
     message.loading('上传中')
+  }
+
+  // 选择上传的封面个数
+  const [imageType, setImageType] = useState(1)
+  const onTypeChange = (e) => {
+    const type = e.target.value
+    setImageType(type)
   }
   return (
     <div className="publish">
@@ -99,14 +111,14 @@ const Publish = () => {
           </Form.Item>
           {/* 封面 */}
           <Form.Item label="封面" >
-            <Form.Item >
-              <Radio.Group>
+            <Form.Item name='type'>
+              <Radio.Group onChange={onTypeChange}>
                 <Radio value={1}>单图</Radio>
                 <Radio value={3}>三图</Radio>
                 <Radio value={0}>无图</Radio>
               </Radio.Group>
             </Form.Item>
-            <Upload
+            {imageType > 0 && <Upload
               // 决定选择文件框的外观样式
               listType="picture-card"
               // 控制显示上传列表,这个属性默认有，默认为true
@@ -114,11 +126,12 @@ const Publish = () => {
               name='image'
               action={'http://geek.itheima.net/v1_0/upload'}
               onChange={onChange}
+              maxCount={imageType}
             >
               <div style={{ marginTop: 8 }}>
                 <PlusOutlined />
               </div>
-            </Upload>
+            </Upload>}
           </Form.Item>
           {/* 内容 */}
           <Form.Item
