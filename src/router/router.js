@@ -4,7 +4,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { AuthRoute } from '@/components/AuthRoute'
 import { Navigate } from 'react-router-dom'
 import Home from '@/pages/Layout/Home/home.jsx'
-import Manage from '@/pages/Layout/Manage/manage.jsx'
+import Artical from '@/pages/Layout/Artical/artical.jsx'
 import Publish from '@/pages/Layout/Publish/publish.jsx'
 
 const router = createBrowserRouter([
@@ -21,8 +21,8 @@ const router = createBrowserRouter([
         element: <Home />
       },
       {
-        path: '/manage',
-        element: <Manage />
+        path: '/artical',
+        element: <Artical />
       },
       {
         path: '/publish',

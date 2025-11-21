@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons'
 import { useNavigate, useLocation, Outlet } from 'react-router-dom'
 import './index.scss'
-import { fetchUserInfo, setUserInfo, setToken } from '@/features/jikeSlice'
+import { fetchUserInfo, setUserInfo, setToken, fetchChannelList } from '@/features/jikeSlice'
 
 const { Header, Sider } = Layout
 
@@ -22,7 +22,7 @@ const items = [
   {
     label: '文章管理',
     icon: <DiffOutlined />,
-    key: '/manage'
+    key: '/artical'
   },
   {
     label: '创建文章',
@@ -34,13 +34,17 @@ const items = [
 const GeekLayout = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
   const handleOnclick = ({ key }) => {
     navigate(key)
   }
-  const dispatch = useDispatch()
+
   useEffect(() => {
     dispatch(fetchUserInfo())
+    dispatch(fetchChannelList())
   }, [dispatch])
+
   return (
     <Layout>
       <Header className="header">

@@ -14,25 +14,15 @@ import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { PlusOutlined } from '@ant-design/icons'
 import { Link } from 'react-router-dom'
-import { getChannelAPI, publishArticleAPI } from '@/apis/artical'
+import { useSelector } from 'react-redux'
+import { publishArticleAPI } from '@/apis/artical'
 import './index.scss'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const { Option } = Select
 
 const Publish = () => {
   const [form] = Form.useForm()
-
-  // 获取频道列表
-  const [channelList, setChannelList] = useState([])
-  useEffect(() => {
-    const getChannelList = async () => {
-      const res = await getChannelAPI()
-      setChannelList(res.data.channels)
-    }
-    getChannelList()
-  }, [])
-
   // 提交表单
   const onFinish = (formValue) => {
     const { title, channel_id, content } = formValue
@@ -53,6 +43,8 @@ const Publish = () => {
       form.resetFields()
     })
   }
+  // 获取频道列表
+  const channelList = useSelector((state) => state.jike.channelList)
 
   // 上传图片的状态改变时的回调
   const [imageList, setImageList] = useState([])
@@ -102,11 +94,12 @@ const Publish = () => {
             rules={[{ required: true, message: '请选择文章频道' }]}
           >
             <Select placeholder="请选择文章频道" style={{ width: 400 }}>
-              {channelList.map((item) => (
-                <Option key={item.id} value={item.id}>
-                  {item.name}
-                </Option>
-              ))}
+              {
+                channelList.map((item) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.name}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
           {/* 封面 */}
