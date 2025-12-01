@@ -78,14 +78,36 @@ const Article = () => {
   const [articleList, setArticleList] = useState([])
   // 获取文章数
   const [count, setCount] = useState(0)
+  // 筛选文章
+  const [reqData, setReqData] = useState({
+    status: '',
+    channel_id: '',
+    begin_pubdate: '',
+    end_pubdate: '',
+    page: 1,
+    per_page: 4
+  })
+
+  const onFinish = (formValue) => {
+    setReqData({
+      ...reqData,
+      status: formValue.status,
+      channel_id: formValue.channel_id,
+      begin_pubdate: formValue.date[0].format('YYYY-MM-DD'),
+      end_pubdate: formValue.date[1].format('YYYY-MM-DD'),
+    })
+
+  }
+
+  // 更新信息时触发重新渲染
   useEffect(() => {
     async function getArticleList() {
-      const res = await getArticleListAPI()
+      const res = await getArticleListAPI(reqData)
       setArticleList(res.data.results)
       setCount(res.data.total_count)
     }
     getArticleList()
-  }, [])
+  }, [reqData])
 
   return (
     <div>
@@ -98,11 +120,11 @@ const Article = () => {
         }
         style={{ marginBottom: 20 }}
       >
-        <Form initialValues={{ status: '', channel_id: "推荐" }}>
+        <Form initialValues={{ status: '' }} onFinish={onFinish}>
           <Form.Item label="状态" name="status">
             <Radio.Group>
               <Radio value={''}>全部</Radio>
-              <Radio value={1}>审核中</Radio>
+              <Radio value={1}>待审核</Radio>
               <Radio value={2}>审核通过</Radio>
             </Radio.Group>
           </Form.Item>
