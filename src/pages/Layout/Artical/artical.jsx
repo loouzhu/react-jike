@@ -1,17 +1,18 @@
-import { Link } from 'react-router-dom'
-import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select } from 'antd'
+import { Link, useNavigate } from 'react-router-dom'
+import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select, Popconfirm } from 'antd'
 // 引入汉化包，让时间选择器选择中文
 import locale from 'antd/es/date-picker/locale/zh_CN'
 import { Table, Tag, Space } from 'antd'
 import { useSelector } from 'react-redux'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useState, useEffect } from 'react'
-import { getArticleListAPI } from '@/apis/artical'
+import { getArticleListAPI, deleteArticalAPI } from '@/apis/artical'
 
 const { Option } = Select
 const { RangePicker } = DatePicker
 
 const Article = () => {
+  const navigate = useNavigate()
   // 准备列数据
   // 准备状态枚举
   const state = {
@@ -60,13 +61,21 @@ const Article = () => {
       render: data => {
         return (
           <Space size="middle">
-            <Button type="primary" shape="circle" icon={<EditOutlined />} />
-            <Button
-              type="primary"
-              danger
-              shape="circle"
-              icon={<DeleteOutlined />}
-            />
+            <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={() => navigate(`/publish?id=${data.id}`)} />
+            <Popconfirm
+              title="删除文章"
+              description="确认删除该文章？"
+              onConfirm={() => onConfirm(data)}
+              okText="是"
+              cancelText="否"
+            >
+              <Button
+                type="primary"
+                danger
+                shape="circle"
+                icon={<DeleteOutlined />}
+              />
+            </Popconfirm>
           </Space>
         )
       }
@@ -79,6 +88,7 @@ const Article = () => {
   // 获取文章数
   const [count, setCount] = useState(0)
   // 筛选文章
+  // 本质是向后端请求不同参数从而展示满足条件的数据
   const [reqData, setReqData] = useState({
     status: '',
     channel_id: '',
@@ -88,6 +98,7 @@ const Article = () => {
     per_page: 4
   })
 
+  // 筛选文章
   const onFinish = (formValue) => {
     setReqData({
       ...reqData,
@@ -96,7 +107,20 @@ const Article = () => {
       begin_pubdate: formValue.date[0].format('YYYY-MM-DD'),
       end_pubdate: formValue.date[1].format('YYYY-MM-DD'),
     })
+  }
 
+  // 切换页面
+  const onPageChange = (current) => {
+    setReqData({
+      ...reqData,
+      page: current
+    })
+  }
+
+  // 删除文章
+  const onConfirm = async (data) => {
+    await deleteArticalAPI(data.id)
+    setReqData({ ...reqData })
   }
 
   // 更新信息时触发重新渲染
@@ -156,7 +180,12 @@ const Article = () => {
       </Card>
       {/*展示文章*/}
       <Card title={`根据筛选条件共查询到 ${count} 条结果：`}>
-        <Table rowKey="id" columns={columns} dataSource={articleList} />
+        <Table rowKey="id" columns={columns} dataSource={articleList} pagination={{
+          align: 'center',
+          total: count,
+          pageSize: reqData.per_page,
+          onChange: onPageChange
+        }} />
       </Card>
     </div>
   )

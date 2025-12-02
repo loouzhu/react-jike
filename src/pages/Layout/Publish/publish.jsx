@@ -8,16 +8,16 @@ import {
   Upload,
   Space,
   Select,
-  message
+  message,
 } from 'antd'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { PlusOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { publishArticleAPI } from '@/apis/artical'
+import { publishArticleAPI, getArticleByIdAPI } from '@/apis/artical'
 import './index.scss'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const { Option } = Select
 
@@ -32,7 +32,10 @@ const Publish = () => {
       content,
       cover: {
         type: imageType,
-        images: imageList.map((item) => item.response.data.url)
+        images: imageList.map((item) => {
+          if (item.url) return item.url
+          if (item.response?.data?.url) return item.response.data.url
+        })
       },
       channel_id
     }
@@ -60,6 +63,27 @@ const Publish = () => {
     const type = e.target.value
     setImageType(type)
   }
+
+  // 回填数据
+  const [searchParams] = useSearchParams()
+  const articleId = searchParams.get('id')
+  useEffect(() => {
+    // 通过id获取数据并回填
+    async function getArticalById() {
+      // 创建文章没有文章id就不回填
+      if (!articleId) return
+      const res = await getArticleByIdAPI(articleId)
+      setImageType(res.data.cover.type)
+      setImageList(res.data.cover.images.map(url => {
+        return { url }
+      }))
+      console.log(imageList)
+      form.setFieldsValue(res.data)
+    }
+    getArticalById()
+  }, [articleId, form])
+  // 编辑文章/发布文章
+  const urlId = !!searchParams.get('id')
   return (
     <div className="publish">
       <Card
@@ -67,7 +91,10 @@ const Publish = () => {
         title={
           <Breadcrumb items={[
             { title: <Link to={'/'}>首页</Link> },
-            { title: '发布文章' },
+            {
+              title:
+                urlId ? '编辑文章' : '发布文章'
+            },
           ]}
           />
         }
@@ -111,20 +138,22 @@ const Publish = () => {
                 <Radio value={0}>无图</Radio>
               </Radio.Group>
             </Form.Item>
-            {imageType > 0 && <Upload
-              // 决定选择文件框的外观样式
-              listType="picture-card"
-              // 控制显示上传列表,这个属性默认有，默认为true
-              showUploadList
-              name='image'
-              action={'http://geek.itheima.net/v1_0/upload'}
-              onChange={onChange}
-              maxCount={imageType}
-            >
-              <div style={{ marginTop: 8 }}>
-                <PlusOutlined />
-              </div>
-            </Upload>}
+            {imageType > 0 &&
+              <Upload
+                // 决定选择文件框的外观样式
+                listType="picture-card"
+                // 控制显示上传列表,这个属性默认有，默认为true
+                showUploadList
+                name='image'
+                action={'http://geek.itheima.net/v1_0/upload'}
+                onChange={onChange}
+                maxCount={imageType}
+                fileList={imageList}
+              >
+                <div style={{ marginTop: 8 }}>
+                  <PlusOutlined />
+                </div>
+              </Upload>}
           </Form.Item>
           {/* 内容 */}
           <Form.Item
